@@ -1,0 +1,77 @@
+import java.io.Console;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
+public class ClientMain
+{
+    private Socket socket = null;
+    private DataInputStream dataInputStream = null;
+    private DataOutputStream dataOutputStream = null;
+
+    public static void main(String[] args)
+    {
+        //ClientMain clientMain = new ClientMain("127.0.0.1", 5000);
+        String hostname = "www.figma.com";
+        try {
+            InetAddress inetAddress = InetAddress.getByName(hostname);
+
+            String ipAddress = inetAddress.getHostAddress();
+
+            System.out.println(ipAddress);
+        }
+        catch (UnknownHostException e)
+        {
+            System.out.println("system can't find the host name: " + hostname);
+            System.out.println(e);
+        }
+    }
+
+    private ClientMain(String serverAddress, int port)
+    {
+        try
+        {
+            socket = new Socket(serverAddress, port);
+
+            System.out.println("Client start to connect");
+            System.out.println("Client connected");
+
+            dataInputStream = new DataInputStream(System.in);
+
+            dataOutputStream = new DataOutputStream(socket.getOutputStream());
+        }
+        catch (Exception ex)
+        {
+            System.out.println(ex);
+        }
+
+        String sendData = "";
+
+        while (!sendData.equals("Disconnect"))
+        {
+            try
+            {
+                sendData = dataInputStream.readLine();
+
+                dataOutputStream.writeUTF(sendData);
+            }
+            catch (Exception ex)
+            {
+                System.out.println(ex);
+            }
+        }
+
+        try
+        {
+            socket.close();
+            dataInputStream.close();
+            dataOutputStream.close();
+        }
+        catch (Exception ex)
+        {
+            System.out.println(ex);
+        }
+    }
+}
